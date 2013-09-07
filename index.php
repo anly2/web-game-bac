@@ -672,7 +672,6 @@ echo '</head>'."\n";
 
 echo '<body>'."\n";
 echo "\n";
-echo '   <div class="contents">'."\n";
 
 if($ai){
 echo '      <div id="suggestionContainer" onclick="suggestionRequest(event);">'."\n";
@@ -680,14 +679,18 @@ echo '         <span>Suggest</span>'."\n";
 echo '      </div>'."\n";
 }
 
+echo '   <div class="contents">'."\n";
+
 echo '      <div id="original"></div>'."\n";
 echo '      <div id="attempts"></div>'."\n";
 echo '      <input id="new" type="text" name="guess" />'."\n";
-echo "\n";
-echo '      <script type="text/javascript">initiate();</script>'."\n";
+
 echo '   </div>'."\n";
 
 echo '</body>'."\n";
+echo "\n";
+echo '<script type="text/javascript">initiate();</script>'."\n";
+echo "\n";
 echo '</html>'."\n";
 
 ?>

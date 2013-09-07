@@ -1,0 +1,210 @@
+body {
+   font-size: 16px;
+   font-family: Courier New;
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   text-align: center;
+}
+body>:first-child {
+   display: inline-block;
+   width: auto;
+   overflow: visible;
+}
+
+
+#add-player {
+   float: right;
+   cursor: pointer;
+   font-size: 2em;
+
+   width: 1em;
+   height: 1em;
+   margin: 1em -2em -2em 1em;
+
+   font-weight: bold;
+   color: lightgray;
+   text-shadow: 1px 1px 1px black;
+}
+
+
+.player {
+   display: block;
+   float: left;
+   margin: 2em 3em;
+   text-align: left;
+}
+.player:not(:first-of-type) {
+   margin-left: 5em;
+}
+
+.player .original,
+.player .attempts > *,
+.player .guess {
+   display: block;
+   text-align: center;
+
+   width: 56px; /* 3.5em */
+   height: 20px; /* 1.25em */
+   margin: 0px;
+
+   font-size: 16px;
+   letter-spacing: 2px; /* 0.125em */
+}
+
+.player .original {
+   border: 0px solid transparent;
+   background-color: #A2A2A2;
+   color: #A2A2A2;
+   font-size: 0px;
+}
+.player .original.editable,
+.player .original.guessed {
+   color: black;
+   font-size: 16px;
+}
+
+.player .attempts {
+   margin: 2px auto 4px;
+}
+.player .attempts > * {
+   display: block;
+   overflow: visible;
+   white-space: nowrap;
+   height: 1em;
+   width: 56px;
+   text-align: left;
+   padding-left: 4px;
+}
+.player .attempts .number{
+   display: inline-block
+   width: 56px;
+}
+.player .attempts .result{
+   display: inline-block;
+   margin-left: 1em;
+   width: 46px;
+}
+.player .attempts .successful{
+   color: #38A10B;
+}
+.player .attempts .flashed{
+   color: #3C6AFF;
+   font-weight: bold;
+}
+
+.player .guess {
+   font-family: Courier New;
+}
+.player .guess.invalid {
+   color: red;
+   font-weight: bold;
+}
+.player .guess.disabled{
+   width: 168px; /* 56+56+56 */
+   margin-left: -56px;
+   margin-right: -56px;
+
+   font-family: Helvetica;
+   font-style: italic;
+   color: black;
+}
+
+
+.player .help {
+   float: left;
+   z-index: 2;
+   position: relative;
+   top: -0.3em;
+   left: 0.25em;
+
+   display: inline-block;
+   overflow: hidden;
+   cursor: pointer;
+
+   width: 0.5em;
+   height: 0.5em;
+   border-radius: 0.5em;
+   margin: 0em -0.5em -0.5em;
+
+   color: lightgray;
+   background-color: lightgray;
+   border: 1px solid #A2A2A2;
+}
+.player.done .help {
+   display: none;
+}
+.player .enter {
+   float: right;
+   z-index: 2;
+   position: relative;
+   top: -2px;
+   left: 0.25em;
+
+
+   display: inline-block;
+   overflow: hidden;
+   cursor: pointer;
+
+   width: 0em;
+   height: 0em;
+   margin: -1em -0.5em 0em;
+
+   border-top: 0.5em solid transparent;
+   border-left: 0.5em solid #A2A2A2;
+   border-bottom: 0.5em solid transparent;
+   border-right: 0em solid transparent;
+}
+.player.done .enter {
+   display: none;
+}
+
+.player .option {
+   cursor: pointer;
+}
+.player .option.set-custom-number {
+   display: inline-block;
+   float: left;
+
+   position: relative;
+   top: 3px;
+   left: -0.25em;
+
+   border-top: 0.5em solid transparent;
+   border-left: 1em solid gray;
+   border-bottom: 0.5em solid transparent;
+   border-right: 0em solid transparent;
+
+   margin: 0em 0em -1em -1em;
+}
+.player .option.set-as-bot {
+   display: inline-block;
+   float: right;
+
+   position: relative;
+   left: 1.25em;
+
+   width: 1em;
+   height: 1em;
+
+   border-radius: 1em;
+   border-bottom-left-radius: 0em;
+
+   background-color: gray;
+
+   margin-bottom: -1em;
+}
+.player .option.set-as-bot.active {
+   background-color: #FF7570;
+}
+
+.commenced .option,
+.commenced .player .option {
+   display: none;
+}
+
+#announcement {
+   font-family: Palatino Linotype, Verdana, Helvetica, Arial;
+}
