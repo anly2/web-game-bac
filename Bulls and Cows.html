@@ -1,3 +1,9 @@
+<html>
+<head>
+   <title>Bulls and Cows</title>
+
+   <script type="text/javascript">
+   // src="main.js"
 symbolBulls = "|";
 symbolCows = "X";
 flash_delay = 2000; //ms
@@ -42,6 +48,7 @@ function prepare (node)
    e["guess"].value = "";
 
    addEvent (e["guess"],             'keydown', handle_keydown);
+   addEvent (e["guess"],             'change',  mobile_shortcut);
 
    addEvent (e["enter"],             'click',   enter);
    addEvent (e["enter"],             'click',   wake_ai);
@@ -706,3 +713,441 @@ function get_help (event) //is called from an event handler
       delete o["guess"].li;
    }
 }
+
+
+
+function mobile_shortcut (event)
+{
+   //if (this.value.substr(-1) == " ")
+   if (this.value.length == 4)
+   {
+      enter(this);
+      wake_ai (this);
+      delete this.li;
+   }
+}
+
+   </script>
+
+   <script type="text/javascript">
+   // src="ai.js"
+entropy = true;
+
+sBulls = symbolBulls;
+sCows  = symbolCows;
+
+possible = new Array();
+possible[0] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+possible[1] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+possible[2] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+possible[3] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+
+
+if(entropy){
+   possible[0].shuffle();
+   possible[1].shuffle();
+   possible[2].shuffle();
+   possible[3].shuffle();
+}
+
+Object.prototype.isAttempt = function ()
+{
+   if (typeof this.number == "number" || typeof this.number == "string")
+   if (typeof this.result != "undefined")
+   //if (typeof this.result.bulls == "number" && typeof this.result.cows == "number")
+      return true;
+
+   return false;
+}
+Object.prototype.res = function ()
+{
+   return sBulls.repeat(this.result.bulls) + sCows.repeat(this.result.cows);
+}
+
+Object.prototype.isPossible = function (num)
+{
+   if (!this.isAttempt()) return;
+
+   var common = num.toString().replace(eval("/[^"+this.number+"]/g"), "");
+   if(common.length > this.res().length)
+      return false;
+
+   var samePos = 0;
+
+   var i;
+   for(i=0; i<num.length; i++)
+      if(num.charAt(i) == this.number.charAt(i))
+         samePos++;
+
+   if(samePos > this.result.bulls)
+      return false;
+
+   return true;
+}
+Object.prototype.test = function (num)
+{
+   num = num.toString();
+
+   var bulls = 0;
+   var cows = 0;
+
+   var i;
+   for(i=0; i<4; i++){
+      if(this.number.charAt(i) == num.charAt(i))
+         bulls++;
+      else
+      if(this.number.indexOf( num.charAt(i) ) != -1)
+         cows++;
+   }
+
+   var res = '';
+   res += sBulls.repeat(bulls);
+   res += sCows.repeat(cows);
+
+   return res;
+}
+
+function suggest (previous)
+{
+   //Previous must be an array of (Attempt) objects containing the number tryed and the result
+   //example: [ {num: 1234, res: 'XX'}, {num: 2156, res: 'XX'}, ... ]
+
+   var cur = '';
+   var discarded = new Array();
+
+   var n;
+//      for(n=0; n<4; n++){
+   pickupDigit: while( (n = cur.length) < 4 ){
+      //Get a digit for the n-th position
+      var chosen = false;
+      var tries  = new Array();
+
+      //Get a digit from the previous attempts
+      var t;
+      lookupAttempts: for(t = previous.length-1;  t>=0;  t--){
+         var p;
+         cycleDigits: for(p=0; p<4; p++){
+            //We have a digit, test it
+            var digit = previous[t].number.charAt(p);
+
+            if(cur.indexOf(digit) != -1)
+               continue;
+
+            if(possible[n].indexOf(parseInt(digit)) == -1)
+               continue;
+
+            if(discarded.indexOf( cur+digit ) != -1)
+               continue;
+
+            var tt;
+            testagainstAttempts: for(tt = previous.length-1;  tt>=0;  tt--){
+               if(previous[tt].isPossible( cur+digit ))
+                  continue testagainstAttempts;
+
+               discarded.push( cur+digit );
+               continue cycleDigits;
+            }
+
+            chosen = digit;
+            break lookupAttempts;
+         }
+      }
+
+      if(chosen === false){
+         var d;
+         for(d=0;  d < possible[n].length;  d++){
+            var digit = possible[n][d];
+
+            if(cur.indexOf(digit) != -1)
+               continue;
+
+               //Log in case no number is eligible, should pick the first to end the misery
+               tries.push(digit);
+
+            if(discarded.indexOf( cur+digit ) != -1)
+               continue;
+
+            chosen = digit;
+            break;
+         }
+      }
+
+      //Add to discarded and start all over, as this is obviously a wrong number
+      if(chosen === false){
+         discarded.push( cur );
+         cur = '';
+         continue;
+      }
+
+      //Test if it can actually be this number
+      if( (cur+chosen).length == 4){
+         testagainstAttempts: for(t = previous.length-1;  t>=0;  t--){
+            var attmp = previous[t];
+            if(attmp.test( (cur+chosen) ) != attmp.res()){
+               discarded.push( (cur+chosen) );
+               cur = '';
+               continue pickupDigit;
+            }
+         }
+      }
+
+      cur += chosen;
+   }
+
+   return cur;
+}
+   </script>
+
+   <style type="text/css">
+   /*<link rel="stylesheet" href="main.css" />*/
+body {
+   font-size: 16px;
+   font-family: Courier New;
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   text-align: center;
+}
+body>:first-child {
+   display: inline-block;
+   width: auto;
+   overflow: visible;
+}
+
+
+#add-player {
+   float: right;
+   cursor: pointer;
+   font-size: 2em;
+
+   width: 1em;
+   height: 1em;
+   margin: 1em -2em -2em 1em;
+
+   font-weight: bold;
+   color: lightgray;
+   text-shadow: 1px 1px 1px black;
+}
+
+
+.player {
+   display: block;
+   float: left;
+   margin: 2em 3em;
+   text-align: left;
+}
+.player:not(:first-of-type) {
+   margin-left: 5em;
+}
+
+.player .original,
+.player .attempts > *,
+.player .guess {
+   display: block;
+   text-align: center;
+
+   width: 56px; /* 3.5em */
+   height: 20px; /* 1.25em */
+   margin: 0px;
+
+   font-size: 16px;
+   letter-spacing: 2px; /* 0.125em */
+}
+
+.player .original {
+   border: 0px solid transparent;
+   background-color: #A2A2A2;
+   color: #A2A2A2;
+   font-size: 0px;
+}
+.player .original > * {
+   /* #temp:original */
+   width: 100%;
+   height: 100%;
+
+   font-size: 16px;
+   color: black;
+
+   text-align: inherit;
+   letter-spacing: inherit;
+
+   background-color: inherit;
+   border: inherit;
+}
+.player .original.guessed {
+   color: black;
+   font-size: 16px;
+}
+
+.player .attempts {
+   margin: 2px auto 4px;
+}
+.player .attempts > * {
+   display: block;
+   overflow: visible;
+   white-space: nowrap;
+   height: 1em;
+   width: 56px;
+   text-align: left;
+   padding-left: 4px;
+}
+.player .attempts .number{
+   display: inline-block
+   width: 56px;
+}
+.player .attempts .result{
+   display: inline-block;
+   margin-left: 1em;
+   width: 46px;
+}
+.player .attempts .successful{
+   color: #38A10B;
+}
+.player .attempts .flashed{
+   color: #3C6AFF;
+   font-weight: bold;
+}
+
+.player .guess {
+   font-family: Courier New;
+   -wap-input-format: "*N";
+}
+.player .guess.invalid {
+   color: red;
+   font-weight: bold;
+}
+.player .guess.disabled{
+   width: 168px; /* 56+56+56 */
+   margin-left: -56px;
+   margin-right: -56px;
+
+   font-family: Helvetica;
+   font-style: italic;
+   color: black;
+}
+
+
+.player .help {
+   float: left;
+   z-index: 2;
+   position: relative;
+   top: -0.3em;
+   left: 0.25em;
+
+   display: inline-block;
+   overflow: hidden;
+   cursor: pointer;
+
+   width: 0.5em;
+   height: 0.5em;
+   border-radius: 0.5em;
+   margin: 0em -0.5em -0.5em;
+
+   color: lightgray;
+   background-color: lightgray;
+   border: 1px solid #A2A2A2;
+}
+.player.done .help {
+   display: none;
+}
+.player .enter {
+   float: right;
+   z-index: 2;
+   position: relative;
+   top: -2px;
+   left: 0.25em;
+
+
+   display: inline-block;
+   overflow: hidden;
+   cursor: pointer;
+
+   width: 0em;
+   height: 0em;
+   margin: -1em -0.5em 0em;
+
+   border-top: 0.5em solid transparent;
+   border-left: 0.5em solid #A2A2A2;
+   border-bottom: 0.5em solid transparent;
+   border-right: 0em solid transparent;
+}
+.player.done .enter {
+   display: none;
+}
+
+.player .option {
+   cursor: pointer;
+}
+.player .option.set-custom-number {
+   display: inline-block;
+   float: left;
+
+   position: relative;
+   top: 3px;
+   left: -0.25em;
+
+   border-top: 0.5em solid transparent;
+   border-left: 1em solid gray;
+   border-bottom: 0.5em solid transparent;
+   border-right: 0em solid transparent;
+
+   margin: 0em 0em -1em -1em;
+}
+.player .option.set-as-bot {
+   display: inline-block;
+   float: right;
+
+   position: relative;
+   left: 1.25em;
+
+   width: 1em;
+   height: 1em;
+
+   border-radius: 1em;
+   border-bottom-left-radius: 0em;
+
+   background-color: gray;
+
+   margin-bottom: -1em;
+}
+.player .option.set-as-bot.active {
+   background-color: #FF7570;
+}
+
+.commenced .option,
+.commenced .player .option {
+   display: none;
+}
+
+#announcement {
+   font-family: Palatino Linotype, Verdana, Helvetica, Arial;
+}
+   </style>
+
+</head>
+<body>
+
+<div class="container">
+
+   <div class="option" id="add-player"> + </div>
+
+   <div id="player:1" class="player">
+         <span class="option set-custom-number"></span>
+         <span class="option set-as-bot"></span>
+      <div class="original"></div>
+      <div class="attempts"></div>
+      <input type="text" class="guess" />
+      <span class="help">*</span>
+      <div class="enter">></div>
+   </div>
+
+</div>
+<div id="announcement"></div>
+
+</body>
+
+<script type="text/javascript">initialize();</script>
+
+</html>
