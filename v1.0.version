@@ -1,0 +1,38 @@
+### Bulls and Cows ###
+#This is a version file
+#  used for dynamically updating links so that people know there's something new
+#  it also contains the changelogs for a given project
+
+
+version 0.0.1
+    - Basic implementation for single player
+
+version 0.1
+    - There is now the feature that allows you to play versus AI
+
+version 0.2
+    - Entropy option added which makes the AI play random numbers. This way it won't always play '1234' first.
+
+version 0.3
+    - Players can now cycle through their previous attempts using the arrow keys
+
+version 1
+    - Support for multiple players
+         + Multiple player slots can be opened on the same page via a "+" button to the right
+    - Several options have been provided
+         + Custom numbers can be set (as "original") using the ">" button to the left of the gray "original" box
+         + Players can be set as bots which means the AI will automatically play in that slot
+         + An "Enter" button (">") has been added to the right of the "guess" input field as an alternative way of entering a number
+         + A small gray circle "help" button has been added to the left of the "guess" input field
+               ++ Clicking that circle will type a suggestion in the "guess" input field. The suggestion is made by the AI based on your previous attempts.
+               ++ ALT + CLICK  makes a suggestion and instantly enters it.
+    - Once the game has commenced (any of the players entered a number) the options (mentioned above) are hidden
+    - Once all players have guessed their number an announcement is displayed which declares the victor(s).
+    - At the end of the game a "play again" link appears which allows you to restart the game with the same setup (same number of players and same AI assignment)
+    - Everything is bound to the DOM elements
+         + No loose "junk" variables (hopefully)
+         + Easy clearing of the "board".
+         + What you see is what is "processed"
+         + Unfortunately, that means more work to "parse" the data
+    - Add a standalone file named "Bulls and Cows.html"
+         + This file has an added "mobile_shortcut" which adds an alternative way of entering numbers (onblur) and also makes the default pad of phones be numeric instead of alphanumeric.
